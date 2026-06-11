@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -41,9 +41,12 @@ fun AddExpenseScreen(navController: NavController, viewModel: ExpenseViewModel) 
             TopAppBar(
                 title = { Text("Tambah Transaksi") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
-                    }
+                    com.example.ui.components.AnimatedIconButton(
+                        icon = Icons.AutoMirrored.Filled.ArrowBack, 
+                        contentDescription = "Kembali",
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
             )
         }

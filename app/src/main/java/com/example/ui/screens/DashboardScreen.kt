@@ -75,7 +75,7 @@ fun DashboardScreen(navController: NavController, viewModel: ExpenseViewModel) {
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Tambah")
+                com.example.ui.components.AnimatedIconButton(icon = Icons.Default.Add, contentDescription = "Tambah", onClick = { navController.navigate("add") })
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -223,46 +223,57 @@ fun MonthlyChartCard(expenses: List<ExpenseEntity>) {
             val incomeColor = GraphBarDefault
             val expenseColor = GraphBarActive
             
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = System.currentTimeMillis()
+            val currentMonth = cal.get(Calendar.MONTH)
+            
+            val monthlyData = expenses.filter { 
+                val exCal = Calendar.getInstance()
+                exCal.timeInMillis = it.date
+                exCal.get(Calendar.MONTH) == currentMonth
+            }
+            
+            val income = monthlyData.filter { it.type == "Pemasukan" }.sumOf { it.amount }.toFloat()
+            val expense = monthlyData.filter { it.type == "Pengeluaran" }.sumOf { it.amount }.toFloat()
+            
+            val maxVal = maxOf(income, expense)
+            val scaleFactor = if(maxVal > 0) 0.8f / maxVal else 0f
+            
+            val animatedIncomeScale by androidx.compose.animation.core.animateFloatAsState(
+                targetValue = income * scaleFactor,
+                animationSpec = androidx.compose.animation.core.tween(1000, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+                label = "income_bar"
+            )
+
+            val animatedExpenseScale by androidx.compose.animation.core.animateFloatAsState(
+                targetValue = expense * scaleFactor,
+                animationSpec = androidx.compose.animation.core.tween(1000, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+                label = "expense_bar"
+            )
+            
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val cal = Calendar.getInstance()
-                cal.timeInMillis = System.currentTimeMillis()
-                val currentMonth = cal.get(Calendar.MONTH)
-                
-                val monthlyData = expenses.filter { 
-                    val exCal = Calendar.getInstance()
-                    exCal.timeInMillis = it.date
-                    exCal.get(Calendar.MONTH) == currentMonth
-                }
-                
-                val income = monthlyData.filter { it.type == "Pemasukan" }.sumOf { it.amount }.toFloat()
-                val expense = monthlyData.filter { it.type == "Pengeluaran" }.sumOf { it.amount }.toFloat()
-                
-                val total = income + expense
-                if (total == 0f) return@Canvas
+                if (maxVal == 0f) return@Canvas
                 
                 val canvasWidth = size.width
                 val canvasHeight = size.height
                 val barWidth = 40.dp.toPx()
                 val spacing = 20.dp.toPx()
                 
-                val maxVal = maxOf(income, expense)
-                val scale = if(maxVal > 0) canvasHeight * 0.8f / maxVal else 0f
-                
                 val startX = (canvasWidth - (barWidth * 2 + spacing)) / 2
                 
                 // Income Bar
                 drawRoundRect(
                     color = incomeColor,
-                    topLeft = Offset(startX, canvasHeight - (income * scale)),
-                    size = Size(barWidth, income * scale),
+                    topLeft = Offset(startX, canvasHeight - (animatedIncomeScale * canvasHeight)),
+                    size = Size(barWidth, animatedIncomeScale * canvasHeight),
                     cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f)
                 )
                 
                 // Expense Bar
                 drawRoundRect(
                     color = expenseColor,
-                    topLeft = Offset(startX + barWidth + spacing, canvasHeight - (expense * scale)),
-                    size = Size(barWidth, expense * scale),
+                    topLeft = Offset(startX + barWidth + spacing, canvasHeight - (animatedExpenseScale * canvasHeight)),
+                    size = Size(barWidth, animatedExpenseScale * canvasHeight),
                     cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f)
                 )
             }

@@ -25,6 +25,8 @@ import com.example.data.ExpenseEntity
 import com.example.ui.ExpenseViewModel
 import com.example.ui.theme.ExpenseColor
 import com.example.ui.theme.IncomeColor
+import com.example.ui.theme.GraphBarActive
+import com.example.ui.theme.GraphBarDefault
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -43,23 +45,40 @@ fun DashboardScreen(navController: NavController, viewModel: ExpenseViewModel) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Keuangan", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .statusBarsPadding(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text("Keuangan Kita", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.5).sp, color = MaterialTheme.colorScheme.onBackground)
+                    Text("Halo, Aris. Selamat pagi!", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("A", color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
+                }
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("add") },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Tambah")
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -67,7 +86,7 @@ fun DashboardScreen(navController: NavController, viewModel: ExpenseViewModel) {
                 .padding(padding)
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(vertical = 16.dp)
+            contentPadding = PaddingValues(top = 16.dp, bottom = 100.dp)
         ) {
             item {
                 BalanceCard(balance, totalIncome, totalExpense)
@@ -75,13 +94,20 @@ fun DashboardScreen(navController: NavController, viewModel: ExpenseViewModel) {
             
             item {
                 if (expenses.isNotEmpty()) {
-                    Text("Grafik Bulanan", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(vertical = 8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Grafik Bulanan", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                        Text("Lihat Detail", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = GraphBarActive)
+                    }
                     MonthlyChartCard(expenses)
                 }
             }
 
             item {
-                Text("Transaksi Terakhir", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 16.dp))
+                Text("Transaksi Terakhir", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(top = 8.dp, bottom = 4.dp).padding(horizontal = 4.dp))
             }
 
             if (expenses.isEmpty()) {
@@ -103,36 +129,36 @@ fun DashboardScreen(navController: NavController, viewModel: ExpenseViewModel) {
 fun BalanceCard(balance: Double, income: Double, expense: Double) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Text("Total Saldo", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f), fontSize = 14.sp)
-            Text(formatRupiah(balance), fontSize = 32.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Total Saldo Anda", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+            Text(formatRupiah(balance), fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(bottom = 16.dp))
             
-            Spacer(modifier = Modifier.height(24.dp))
+            HorizontalDivider(color = Color.White.copy(alpha = 0.1f), modifier = Modifier.padding(bottom = 16.dp))
             
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.size(24.dp).clip(RoundedCornerShape(8.dp)).background(IncomeColor.copy(alpha=0.2f)), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.ArrowDownward, contentDescription = null, tint = IncomeColor, modifier = Modifier.size(16.dp))
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Pemasukan", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f), fontSize = 12.sp)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                    Box(modifier = Modifier.size(32.dp).clip(RoundedCornerShape(50)).background(Color.Green.copy(alpha=0.2f)), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.ArrowDownward, contentDescription = null, tint = Color.Green, modifier = Modifier.size(16.dp))
                     }
-                    Text(formatRupiah(income), fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top=4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text("PEMASUKAN", color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                        Text("+ ${formatRupiah(income)}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(top=2.dp))
+                    }
                 }
                 
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.size(24.dp).clip(RoundedCornerShape(8.dp)).background(ExpenseColor.copy(alpha=0.2f)), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.ArrowUpward, contentDescription = null, tint = ExpenseColor, modifier = Modifier.size(16.dp))
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Pengeluaran", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f), fontSize = 12.sp)
+                Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                    Box(modifier = Modifier.size(32.dp).clip(RoundedCornerShape(50)).background(Color.Red.copy(alpha=0.2f)), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.ArrowUpward, contentDescription = null, tint = Color.Red, modifier = Modifier.size(16.dp))
                     }
-                    Text(formatRupiah(expense), fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top=4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text("PENGELUARAN", color = Color.White.copy(alpha = 0.6f), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.sp)
+                        Text("- ${formatRupiah(expense)}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White, modifier = Modifier.padding(top=2.dp))
+                    }
                 }
             }
         }
@@ -154,32 +180,30 @@ fun TransactionItem(expense: ExpenseEntity, onDelete: (ExpenseEntity) -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier.padding(12.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(40.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(color.copy(alpha = 0.1f)),
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, tint = color)
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(expense.category, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                if (expense.note.isNotEmpty()) {
-                    Text(expense.note, fontSize = 12.sp, color = Color.Gray, maxLines = 1)
-                }
-                Text(dateString, fontSize = 12.sp, color = Color.Gray)
+                Text(expense.category, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onBackground)
+                val subtitle = if (expense.note.isNotEmpty()) "${expense.category} • $dateString • ${expense.note}" else "${expense.category} • $dateString"
+                Text(subtitle, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
             }
             
             Text(
-                text = "${if(isIncome) "+" else "-"}${formatRupiah(expense.amount)}",
+                text = "${if(isIncome) "+" else "-"} ${formatRupiah(expense.amount)}",
                 color = color,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize = 14.sp
             )
         }
     }
@@ -192,11 +216,12 @@ fun MonthlyChartCard(expenses: List<ExpenseEntity>) {
             .fillMaxWidth()
             .height(200.dp),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
     ) {
         Box(modifier = Modifier.padding(16.dp).fillMaxSize(), contentAlignment = Alignment.Center) {
-            val incomeColor = IncomeColor
-            val expenseColor = ExpenseColor
+            val incomeColor = GraphBarDefault
+            val expenseColor = GraphBarActive
             
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val cal = Calendar.getInstance()
@@ -217,8 +242,8 @@ fun MonthlyChartCard(expenses: List<ExpenseEntity>) {
                 
                 val canvasWidth = size.width
                 val canvasHeight = size.height
-                val barWidth = 60.dp.toPx()
-                val spacing = 40.dp.toPx()
+                val barWidth = 40.dp.toPx()
+                val spacing = 20.dp.toPx()
                 
                 val maxVal = maxOf(income, expense)
                 val scale = if(maxVal > 0) canvasHeight * 0.8f / maxVal else 0f
@@ -230,7 +255,7 @@ fun MonthlyChartCard(expenses: List<ExpenseEntity>) {
                     color = incomeColor,
                     topLeft = Offset(startX, canvasHeight - (income * scale)),
                     size = Size(barWidth, income * scale),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(16f, 16f)
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f)
                 )
                 
                 // Expense Bar
@@ -238,7 +263,7 @@ fun MonthlyChartCard(expenses: List<ExpenseEntity>) {
                     color = expenseColor,
                     topLeft = Offset(startX + barWidth + spacing, canvasHeight - (expense * scale)),
                     size = Size(barWidth, expense * scale),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(16f, 16f)
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f, 8f)
                 )
             }
             
@@ -247,9 +272,9 @@ fun MonthlyChartCard(expenses: List<ExpenseEntity>) {
                 modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text("Pemasukan", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(modifier = Modifier.width(40.dp))
-                Text("Pengeluaran", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Pemasukan", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Spacer(modifier = Modifier.width(32.dp))
+                Text("Pengeluaran", fontSize = 10.sp, color = GraphBarActive, fontWeight = FontWeight.Bold)
             }
         }
     }

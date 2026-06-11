@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <!-- Let's use a solid dark green background as generated icon was emerald -->
+            <solid android:color="#023020"/>
+        </shape>
+    </item>
+</layer-list>

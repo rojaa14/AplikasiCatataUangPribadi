@@ -1,0 +1,6 @@
+{
+  "name": "Keuangan",
+  "description": "Aplikasi pencatat keuangan pribadi dengan fitur pemasukan, pengeluaran, kategori, dan grafik bulanan.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
